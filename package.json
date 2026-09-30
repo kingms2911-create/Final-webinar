@@ -1,3 +1,0 @@
-{"name":"india-ayega-webinar","private":true,"version":"2.0.0",
-"scripts":{"build":"echo static site, nothing to build"},
-"dependencies":{"agora-token":"^2.0.5"}}
