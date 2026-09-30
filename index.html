@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>India Ayega Online - Webinar Studio</title>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.23.0.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#141B34;--ink2:#4B5675;--line:#E3E7F0;--paper:#F4F6FB;--white:#fff;--acc:#F26B1D;--acc2:#D95A10;--live:#E5383B;--stage:#0E1428}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Plus Jakarta Sans",system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+button,input{font-family:inherit}
+:focus-visible{outline:3px solid #9DB4FF;outline-offset:2px}
+.nav{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding:10px 20px;background:var(--white);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;border-radius:12px;object-fit:cover;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px}
+.bn{font-weight:800;font-size:16px;letter-spacing:-.01em}.bs{font-size:12px;color:var(--ink2);font-weight:500}
+.navr{display:flex;align-items:center;gap:12px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px;background:var(--paper);color:var(--ink2);border:1px solid var(--line)}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#9AA3BB}
+.pill.live{background:#FFECEC;color:var(--live);border-color:#FFC9CA}.pill.live::before{background:var(--live);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tabs{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:3px}
+.tab{background:none;border:0;color:var(--ink2);padding:8px 16px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600}
+.tab.on{background:var(--ink);color:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;padding:16px 20px;max-width:1280px;margin:0 auto}
+.main{min-width:0}
+#video{position:relative;width:100%;aspect-ratio:16/9;background:radial-gradient(120% 120% at 50% 0%,#1B2550 0%,var(--stage) 60%);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(20,27,52,.18)}
+#ph{position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;text-align:center;padding:20px;color:#AAB4D4;font-size:15px;font-weight:500}
+#ph::before{content:"";width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='%23AAB4D4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='6' width='13' height='12' rx='3'/%3E%3Cpath d='M22 8l-7 4 7 4z'/%3E%3C/svg%3E") center no-repeat}
+#tag{position:absolute;top:14px;left:14px;font-size:12px;font-weight:600;color:#fff;background:rgba(14,20,40,.6);backdrop-filter:blur(6px);padding:6px 12px;border-radius:99px;z-index:3}
+#cta{display:none;position:absolute;left:14px;right:14px;bottom:14px;z-index:4;background:var(--white);color:var(--ink);border-radius:14px;padding:12px 16px;justify-content:space-between;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);border-left:5px solid var(--acc)}
+#err{display:none;margin-top:12px;padding:12px 16px;background:#FFECEC;color:#9B1C1F;border:1px solid #FFC9CA;border-radius:12px;font-size:13px;font-weight:500;word-break:break-word}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding:10px;background:var(--white);border:1px solid var(--line);border-radius:16px}
+.btn{background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:11px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:600;transition:background .15s}
+.btn:hover{background:#E9EDF6}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}.btn.p:hover{background:var(--acc2)}
+.btn.d{background:var(--live);border-color:var(--live);color:#fff}.btn.d:hover{background:#c92d30}
+.btn.a{background:var(--ink);border-color:var(--ink);color:#fff}.btn.a:hover{background:#252f55}
+.chat{display:flex;flex-direction:column;background:var(--white);border:1px solid var(--line);border-radius:18px;height:calc(100vh - 110px);min-height:420px;max-height:640px;position:sticky;top:78px}
+.ch{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);font-size:15px}
+#viewers{font-size:12px;font-weight:600;color:var(--ink2);background:var(--paper);padding:4px 10px;border-radius:99px}
+#msgs{flex:1;overflow-y:auto;padding:14px 16px;font-size:14px;line-height:1.45}
+#msgs div{margin-bottom:10px;padding:9px 12px;background:var(--paper);border-radius:12px;color:var(--ink)}
+#msgs b{color:var(--acc2);font-weight:700}
+.ci{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+input{flex:1;width:100%;background:var(--paper);border:1px solid var(--line);color:var(--ink);padding:11px 14px;border-radius:12px;font-size:14px}
+.ov{display:none;position:fixed;inset:0;background:rgba(14,20,40,.55);align-items:center;justify-content:center;z-index:50;padding:16px}
+.md{background:var(--white);border-radius:18px;padding:22px;width:100%;max-width:430px;display:flex;flex-direction:column;gap:8px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.md h3{margin:0 0 6px;font-size:18px}.md label{font-size:13px;color:var(--ink2);font-weight:600;margin-top:4px}.row{display:flex;gap:8px;margin-top:10px}
+@media(max-width:900px){.layout{grid-template-columns:1fr;padding:12px}.chat{position:static;height:400px}.nav{padding:10px 12px}}
+@media(prefers-reduced-motion:reduce){.pill.live::before{animation:none}}
+</style></head><body>
+<div class="nav">
+ <div class="brand"><img id="logoImg" class="logo" style="display:none"><div id="logoPh" class="logo">I</div>
+  <div><div class="bn" id="bname">India Ayega Online</div><div class="bs">Webinar Studio</div></div></div>
+ <div class="navr"><span class="pill" id="pill">Offline</span>
+  <span class="tabs"><button class="tab on" id="tHost">Host</button><button class="tab" id="tAtt">Attendee</button></span></div>
+</div>
+<div class="layout">
+ <section class="main">
+  <div id="video"><div id="ph"></div><span id="tag">India Ayega Online</span>
+   <div id="cta"><div><b>Special offer</b><br>Aaj join karo aur 50% off pao.</div><button class="btn p" id="ctaClose">Claim offer</button></div></div>
+  <div id="err"></div>
+  <div class="controls" id="ctl"></div>
+ </section>
+ <aside class="chat"><div class="ch"><b>Live Chat</b><span id="viewers" style="color:#94a3b8;font-size:12px">0 online</span></div>
+  <div id="msgs"></div>
+  <div class="ci"><input id="mi" placeholder="Type a message..."><button class="btn p" id="ms">Send</button></div></aside>
+</div>
+
+<div class="ov" id="brandOv"><div class="md"><h3>Brand Settings (White-Label)</h3>
+ <label>Business Name</label><input id="bnIn" placeholder="Client business name">
+ <label>Logo Image URL</label><input id="blIn" placeholder="https://.../logo.png">
+ <div class="row"><button class="btn p" id="bSave">Save</button><button class="btn" id="bReset">Reset</button><button class="btn" id="bClose">Close</button></div></div></div>
+
+<div class="ov" id="setOv"><div class="md"><h3>Settings</h3>
+ <label>Manual App ID (sirf backup, token server ho toh khali chhodo)</label><input id="aid">
+ <label>Manual Token (sirf backup)</label><input id="atk">
+ <label>Host Key (token server wala secret password, sirf host ke liye)</label><input id="ahk" type="password">
+ <label>Channel</label><input id="ach">
+ <div class="row"><button class="btn p" id="sSave">Save</button><button class="btn" id="sClose">Close</button></div></div></div>
+
+<script>
+// ===== CONFIG (ya app ke andar Settings button se daalo) =====
+var DEFAULTS = { appId: "", token: "", hostKey: "", channel: "main-webinar-room" };
+// =============================================================
+var $ = function(id){return document.getElementById(id)};
+var cfg = Object.assign({}, DEFAULTS);
+try { Object.assign(cfg, JSON.parse(localStorage.getItem("agoraCfg")||"{}")); } catch(e){}
+var brand = {name:"India Ayega Online", logo:""};
+try { brand = Object.assign(brand, JSON.parse(localStorage.getItem("brand")||"{}")); } catch(e){}
+
+var client=null, mic=null, cam=null, tab="host", status="offline", micOn=true, camOn=true, poll=null;
+var attendeeOnly = new URLSearchParams(location.search).get("view")==="attendee";
+if(attendeeOnly){ tab="attendee"; document.querySelector(".tabs").style.display="none"; }
+
+function showErr(m){var e=$("err");e.style.display=m?"block":"none";e.textContent=m||""}
+function renderBrand(){
+  $("bname").textContent=brand.name; $("tag").textContent=brand.name;
+  var img=$("logoImg"),ph=$("logoPh");
+  if(brand.logo){img.src=brand.logo;img.style.display="block";ph.style.display="none";img.onerror=function(){img.style.display="none";ph.style.display="flex"}}
+  else{img.style.display="none";ph.style.display="flex";ph.textContent=brand.name.charAt(0)}
+}
+function renderCtl(){
+  var c=$("ctl"),h="";
+  if(tab==="host"){
+    h+= status==="hosting" ? '<button class="btn d" id="bEnd">End Live</button>' : '<button class="btn p" id="bStart">Start Live</button>';
+    h+='<button class="btn" id="bMic"'+(status!=="hosting"?" disabled":"")+'>'+(micOn?"Mute":"Unmute")+'</button>';
+    h+='<button class="btn" id="bCam"'+(status!=="hosting"?" disabled":"")+'>'+(camOn?"Camera Off":"Camera On")+'</button>';
+    h+='<button class="btn a" id="bCta">Push Offer</button><button class="btn" id="bBrand">Branding</button><button class="btn p" id="bCopy">Copy Attendee Link</button>';
+  } else {
+    h+= status==="watching" ? '<button class="btn d" id="bEnd">Leave</button>' : '<button class="btn p" id="bJoin">Join Webinar</button>';
+  }
+  if(!attendeeOnly) h+='<button class="btn" id="bSet">Settings</button>';
+  c.innerHTML=h;
+  var on=function(id,f){var el=$(id);if(el)el.onclick=f};
+  on("bStart",startHost);on("bJoin",joinAtt);on("bEnd",leave);on("bMic",toggleMic);on("bCam",toggleCam);
+  on("bCta",function(){var c=$("cta");c.style.display=c.style.display==="flex"?"none":"flex"});
+  on("bBrand",function(){$("bnIn").value=brand.name;$("blIn").value=brand.logo;$("brandOv").style.display="flex"});
+  on("bCopy",function(){
+    var link=location.origin+location.pathname+"?view=attendee", b=$("bCopy");
+    var done=function(){b.textContent="Link Copied!";setTimeout(function(){b.textContent="Copy Attendee Link"},2000)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(link).then(done,function(){prompt("Link copy karo:",link)})}
+    else{prompt("Link copy karo:",link)}
+  });
+  on("bSet",function(){$("aid").value=cfg.appId;$("atk").value=cfg.token;$("ach").value=cfg.channel;$("ahk").value=cfg.hostKey||"";$("setOv").style.display="flex"});
+  $("ph").textContent = status==="offline" ? (tab==="host"?'Camera preview yahan dikhega. "Start Live" dabao.':'Webinar dekhne ke liye Join dabao.') : (tab==="host"?"":"Host ka wait kar rahe hain...");
+  $("ph").style.display = (status==="hosting"||$("video").querySelector("video"))?"none":"flex";
+  $("pill").textContent = status==="offline"?"Offline":"Live"; $("pill").className="pill"+(status==="offline"?"":" live");
+}
+function getClient(){
+  if(client)return client;
+  client=AgoraRTC.createClient({mode:"live",codec:"vp8"});
+  client.on("user-published",async function(u,t){
+    await client.subscribe(u,t);
+    if(t==="video"){u.videoTrack.play("video");$("ph").style.display="none"}
+    if(t==="audio")u.audioTrack.play();
+  });
+  client.on("user-unpublished",function(u,t){if(t==="video")renderCtl()});
+  return client;
+}
+async function leave(){
+  try{ if(mic){mic.stop();mic.close();mic=null} if(cam){cam.stop();cam.close();cam=null} if(client)await client.leave(); }catch(e){}
+  clearInterval(poll); $("viewers").textContent="0 online"; status="offline"; renderCtl();
+}
+async function getCreds(role){
+  try{
+    var r=await fetch("/.netlify/functions/token?role="+(role==="host"?"host":"audience")+"&channel="+encodeURIComponent(cfg.channel)+"&key="+encodeURIComponent(cfg.hostKey||""));
+    if(r.status===403) throw new Error("Host Key galat hai. Settings mein sahi Host Key daalo.");
+    if(r.ok) return await r.json();
+  }catch(e){ if(String(e.message).indexOf("Host Key")===0) throw e; }
+  if(!cfg.appId) throw new Error("Token server nahi mila aur manual App ID bhi khali hai.");
+  return {appId:cfg.appId,token:cfg.token||null,channel:cfg.channel};
+}
+async function join(role){
+  showErr(""); await leave();
+  var cr=await getCreds(role);
+  var c=getClient(); await c.setClientRole(role);
+  await c.join(cr.appId,cr.channel,cr.token||null,null);
+  poll=setInterval(function(){try{$("viewers").textContent=(c.getRTCStats().UserCount||0)+" online"}catch(e){}},4000);
+  return true;
+}
+async function startHost(){
+  try{
+    if(!(await join("host")))return;
+    var t=await AgoraRTC.createMicrophoneAndCameraTracks(); mic=t[0]; cam=t[1];
+    await client.publish([mic,cam]); cam.play("video");
+    micOn=camOn=true; status="hosting"; renderCtl();
+  }catch(e){showErr(e.message||String(e)); await leave()}
+}
+async function joinAtt(){
+  try{ if(!(await join("audience")))return; status="watching"; renderCtl(); }
+  catch(e){showErr(e.message||String(e)); await leave()}
+}
+async function toggleMic(){await mic.setEnabled(!micOn);micOn=!micOn;renderCtl()}
+async function toggleCam(){await cam.setEnabled(!camOn);camOn=!camOn;renderCtl()}
+
+function addMsg(u,t){var d=document.createElement("div");var b=document.createElement("b");b.textContent=u+": ";d.appendChild(b);d.appendChild(document.createTextNode(t));$("msgs").appendChild(d);$("msgs").scrollTop=1e9}
+[["Rahul","Namaste sir, audio clear hai!"],["Priya","Very useful session \ud83d\udc4d"],["Amit","Recording milegi kya?"]].forEach(function(m){addMsg(m[0],m[1])});
+function send(){var v=$("mi").value.trim();if(!v)return;addMsg(status==="hosting"?"Host":"You",v);$("mi").value=""}
+$("ms").onclick=send; $("mi").onkeydown=function(e){if(e.key==="Enter")send()};
+
+async function switchTab(t){if(t===tab)return;if(status!=="offline")await leave();tab=t;$("tHost").className="tab"+(t==="host"?" on":"");$("tAtt").className="tab"+(t==="att"?" on":"");tab=t==="att"?"attendee":"host";renderCtl()}
+$("tHost").onclick=function(){switchTab("host")}; $("tAtt").onclick=function(){switchTab("att")};
+$("ctaClose").onclick=function(){$("cta").style.display="none"};
+$("bClose").onclick=function(){$("brandOv").style.display="none"};
+$("bSave").onclick=function(){brand={name:$("bnIn").value.trim()||"India Ayega Online",logo:$("blIn").value.trim()};localStorage.setItem("brand",JSON.stringify(brand));renderBrand();$("brandOv").style.display="none"};
+$("bReset").onclick=function(){brand={name:"India Ayega Online",logo:""};localStorage.removeItem("brand");renderBrand();$("brandOv").style.display="none"};
+$("sClose").onclick=function(){$("setOv").style.display="none"};
+$("sSave").onclick=function(){cfg={appId:$("aid").value.trim(),token:$("atk").value.trim(),hostKey:$("ahk").value.trim(),channel:$("ach").value.trim()||"main-webinar-room"};localStorage.setItem("agoraCfg",JSON.stringify(cfg));$("setOv").style.display="none";showErr("")};
+renderBrand(); renderCtl();
+</script></body></html>
