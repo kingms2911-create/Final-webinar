@@ -34,12 +34,14 @@ const headers = { "Content-Type": "application/json", "Cache-Control": "no-store
 const reply = (status, obj) => new Response(JSON.stringify(obj), { status, headers });
 
 export async function onRequestGet({ request, env }) {
-  const APP_ID = env.APP_ID || env.AGORA_APP_ID;
-  const APP_CERTIFICATE = env.APP_CERTIFICATE || env.AGORA_APP_CERTIFICATE;
+  const APP_ID = String(env.APP_ID || env.AGORA_APP_ID || "").trim();
+  const APP_CERTIFICATE = String(env.APP_CERTIFICATE || env.AGORA_APP_CERTIFICATE || "").trim();
   const HOST_KEY = env.HOST_KEY;
   if (!APP_ID || !APP_CERTIFICATE) return reply(500, { error: "APP_ID / APP_CERTIFICATE variables missing" });
 
   const q = new URL(request.url).searchParams;
+  // temporary check: /token?debug=1 shows only the LENGTH of App ID and Certificate (both should be 32)
+  if (q.get("debug") === "1") return reply(200, { appIdLength: APP_ID.length, certLength: APP_CERTIFICATE.length });
   const channel = String(q.get("channel") || "main-webinar-room").slice(0, 64);
   const isHost = q.get("role") === "host";
 
