@@ -73,8 +73,8 @@ input{flex:1;width:100%;background:var(--paper);border:1px solid var(--line);col
  <div class="row"><button class="btn p" id="bSave">Save</button><button class="btn" id="bReset">Reset</button><button class="btn" id="bClose">Close</button></div></div></div>
 
 <div class="ov" id="setOv"><div class="md"><h3>Settings</h3>
- <label>Manual App ID (sirf backup, token server ho toh khali chhodo)</label><input id="aid">
- <label>Manual Token (sirf backup)</label><input id="atk">
+ <label>Manual App ID (sirf testing, normal use mein khali)</label><input id="aid">
+ <label>Manual Token (sirf testing, normal use mein khali)</label><input id="atk">
  <label>Host Key (token server wala secret password, sirf host ke liye)</label><input id="ahk" type="password">
  <label>Channel</label><input id="ach">
  <div class="row"><button class="btn p" id="sSave">Save</button><button class="btn" id="sClose">Close</button></div></div></div>
@@ -143,6 +143,8 @@ async function leave(){
   clearInterval(poll); $("viewers").textContent="0 online"; status="offline"; renderCtl();
 }
 async function getCreds(role){
+  // manual App ID + Token (Settings) are used first when both are filled - handy for testing
+  if(cfg.appId && cfg.token) return {appId:cfg.appId,token:cfg.token,channel:cfg.channel};
   try{
     var r=await fetch("/token?role="+(role==="host"?"host":"audience")+"&channel="+encodeURIComponent(cfg.channel)+"&key="+encodeURIComponent(cfg.hostKey||""));
     if(r.status===403) throw new Error("Host Key galat hai. Settings mein sahi Host Key daalo.");
